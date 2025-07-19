@@ -15,9 +15,11 @@ export class SendForgotPasswordMailController {
 			await sendForgotPasswordMailUseCase.execute(email);
 
 			return response.status(200).send();
-		} catch (error: any) {
-			console.log(error);
-			return response.status(400).json({ error: error.message });
+		} catch (error: unknown) {
+			if (error instanceof AppError) {
+				return response.status(error.statusCode).json({ message: error.message });
+			}
+			return response.status(500).json({ message: "Internal server error" });
 		}
 	}
 }
