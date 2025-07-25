@@ -2,6 +2,8 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import { IStorageProvider } from "../IStorageProvider";
 import { AppError } from "@shared/errors/AppError";
+import upload from "@config/upload";
+import path from "path";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,12 +17,15 @@ export class CloudinaryStorageProvider implements IStorageProvider {
 
     async saveFile(file: string, folder: string): Promise<string> {
         try {
-            const result = await cloudinary.uploader.upload(file, {
+            const localFilePath = path.resolve(upload.tmpFolder, file);
+
+            const result = await cloudinary.uploader.upload(localFilePath, {
                 folder,
                 resource_type: "image",
             });
 
-            await fs.promises.unlink(file);
+
+            await fs.promises.unlink(localFilePath);
 
             return result.public_id!;
 

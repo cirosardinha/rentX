@@ -8,6 +8,7 @@ import { DayjsDateProvider } from "./DateProvider/implementations/DayjsDateProvi
 import { EtherealMailProvider } from "./MailProvider/implementations/EtherealMailProvider";
 import { LocalStorageProvider } from "./StorageProvider/implementations/LocalStorageProvider";
 import { CloudinaryStorageProvider } from "./StorageProvider/implementations/CloudinaryStorageProvider";
+import { AppError } from "@shared/errors/AppError";
 
 container.registerSingleton<IDateProvider>(
 	"DayjsDateProvider",
@@ -19,12 +20,19 @@ container.registerInstance<IMailProvider>(
 	new EtherealMailProvider()
 );
 
-const diskStorage = {
+const storageProviders = {
 	local: LocalStorageProvider,
 	cloudinary: CloudinaryStorageProvider,
 };
 
+const driver = process.env.STORAGE_DRIVER || "local";
+const provider = storageProviders[driver as keyof typeof storageProviders];
+
+if (!provider) {
+	throw new AppError(`Storage provider "${driver}" is not supported.`);
+}
+
 container.registerSingleton<IStorageProvider>(
 	"StorageProvider",
-	diskStorage[process.env.disk as keyof typeof diskStorage]
+	provider
 );

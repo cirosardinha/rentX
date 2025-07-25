@@ -6,6 +6,7 @@ import crypto from "crypto";
 const tmpFolder = resolve(__dirname, "..", "..", "tmp");
 
 export default {
+	driver: process.env.STORAGE_DRIVER || "local",
 	tmpFolder,
 
 	storage: multer.diskStorage({

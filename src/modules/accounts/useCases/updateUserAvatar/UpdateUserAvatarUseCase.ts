@@ -26,9 +26,7 @@ export class UpdateUserAvatarUseCase {
 			await this.storageProvider.deleteFile(user!.avatar, "avatar");
 		}
 
-		const localFilePath = path.resolve(upload.tmpFolder, avatar_file);
-
-		const savedFile = await this.storageProvider.saveFile(localFilePath, "avatar");
+		const savedFile = await this.storageProvider.saveFile(avatar_file, "avatar");
 
 		user!.avatar = savedFile;
 
